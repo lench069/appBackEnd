@@ -3,7 +3,7 @@
 class Productos_Ctrl
 {
     public $M_Producto = null;
-    public $server = 'http://192.168.100.94/pedidosApp-back/';
+    public $server = 'http://192.168.100.94/appBackEnd/';
     //public $server = 'http://riobytes.com/pedidosApp-back/';
 
     public function __construct()
@@ -48,12 +48,15 @@ class Productos_Ctrl
     {
         $producto_id = $f3->get('PARAMS.producto_id');
         $this->M_Producto->load(['id = ?', $producto_id]);
+        
         $msg = "";
         $item = array();
         if ($this->M_Producto->loaded() > 0) {
             $msg = "Producto encontrado.";
             $item = $this->M_Producto->cast();
             $item['precio'] = round($item['precio']);
+            $item['imagen'] = !empty($item['imagen']) ? $this->server. $item['imagen'] : 'http://via.placeholder.com/300x300';
+            $items[] = $item;
         } else {
             $msg = "El producto no existe.";
         }

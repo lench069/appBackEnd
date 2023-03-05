@@ -26,6 +26,8 @@ class Clientes_Ctrl
             $this->M_Cliente->set('correo', $f3->get('POST.correo'));
             $this->M_Cliente->set('direccion', $f3->get('POST.direccion'));
             $this->M_Cliente->set('uuid', $f3->get('POST.uuid'));
+            $this->M_Cliente->set('pass', $f3->get('POST.pass'));
+            $this->M_Cliente->set('activo', $f3->get('POST.activo'));
             $this->M_Cliente->save();
             echo json_encode([
                 'mensaje' => 'Cliente creado',
@@ -115,6 +117,7 @@ class Clientes_Ctrl
     {
         $cliente_id = $f3->get('PARAMS.cliente_id');
         $this->M_Cliente->load(['id = ?', $cliente_id]);
+        //echo $f3->get('DB')->log();
         $msg = "";
         $info = array();
         if ($this->M_Cliente->loaded() > 0) {
