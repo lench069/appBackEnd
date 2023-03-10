@@ -165,12 +165,19 @@ class Productos_Ctrl
     public function Guardar_Imagen($contenido) 
     {
         $nombre_imagen = '';
-        if(!empty($contenido)) {
-            $contenido = explode('base64,', $contenido);
-            $imagen = $contenido[1];
-            $nombre_imagen = 'imagenes/' . time() . '.jpg';
-            file_put_contents($nombre_imagen, base64_decode($imagen));
+        if (!empty($contenido)){
+
+            if (strpos($contenido, 'appBackEnd')) {
+                $nombre_imagen = substr($contenido, -23);   
+            }else{
+                
+                $contenido = explode('base64,', $contenido);
+                $imagen = $contenido[1];
+                $nombre_imagen = 'imagenes/' . time() . '.jpg';
+                file_put_contents($nombre_imagen, base64_decode($imagen));  
+            }   
         }
+       
         return $nombre_imagen;
     }
 }

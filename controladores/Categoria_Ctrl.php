@@ -3,7 +3,7 @@
 class Categoria_Ctrl
 {
     public $M_Categoria = null;
-
+    public $server = 'http://192.168.100.94/appBackEnd/';
     public function __construct()
     {
         $this->M_Categoria = new M_Categoria();
@@ -75,12 +75,19 @@ class Categoria_Ctrl
     public function Guardar_Imagen($contenido) 
     {
         $nombre_imagen = '';
-        if(!empty($contenido)) {
-            $contenido = explode('base64,', $contenido);
-            $imagen = $contenido[1];
-            $nombre_imagen = 'imagenes/' . time() . '.jpg';
-            file_put_contents($nombre_imagen, base64_decode($imagen));
+        if (!empty($contenido)){
+
+            if (strpos($contenido, 'appBackEnd')) {
+                $nombre_imagen = substr($contenido, -23);   
+            }else{
+                
+                $contenido = explode('base64,', $contenido);
+                $imagen = $contenido[1];
+                $nombre_imagen = 'imagenes/' . time() . '.jpg';
+                file_put_contents($nombre_imagen, base64_decode($imagen));  
+            }   
         }
+       
         return $nombre_imagen;
     }
 
@@ -132,7 +139,7 @@ class Categoria_Ctrl
                 $this->M_Categoria->set('imagen', $this->Guardar_Imagen($f3->get('POST.imagen')));
                 $this->M_Categoria->set('descripcion', $f3->get('POST.descripcion'));
                 $this->M_Categoria->save();
-
+                //echo $f3->get('DB')->log();
                 $msg = "Categoria actualizada.";
                 $info['id'] = $this->M_Categoria->get('id');
             
