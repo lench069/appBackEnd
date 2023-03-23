@@ -4,6 +4,7 @@ class Categoria_Ctrl
 {
     public $M_Categoria = null;
     public $server = 'http://192.168.100.94/appBackEnd/';
+    //public $server = 'http://riobytes.com/appBackEnd/';
     public function __construct()
     {
         $this->M_Categoria = new M_Categoria();

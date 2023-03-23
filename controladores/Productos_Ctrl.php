@@ -4,7 +4,7 @@ class Productos_Ctrl
 {
     public $M_Producto = null;
     public $server = 'http://192.168.100.94/appBackEnd/';
-    //public $server = 'http://riobytes.com/pedidosApp-back/';
+    //public $server = 'http://riobytes.com/appBackEnd/';
 
     public function __construct()
     {
@@ -54,7 +54,7 @@ class Productos_Ctrl
         if ($this->M_Producto->loaded() > 0) {
             $msg = "Producto encontrado.";
             $item = $this->M_Producto->cast();
-            $item['precio'] = round($item['precio']);
+            $item['precio'] = $item['precio'];
             $item['imagen'] = !empty($item['imagen']) ? $this->server. $item['imagen'] : 'http://via.placeholder.com/300x300';
             $items[] = $item;
         } else {
