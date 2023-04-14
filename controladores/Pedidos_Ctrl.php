@@ -204,8 +204,8 @@ class Pedidos_Ctrl
     {
         $f3->get('DB')->begin();
         $resultado = $f3->get('DB')->exec("SELECT * FROM `pedidos` as pe INNER JOIN clientes as cli ON pe.cliente_id=cli.id WHERE 
-        pe.fecha BETWEEN "."'".$f3->get('POST.fecha_ini')."'"." AND "."'".$f3->get('POST.fecha_fin')."'"." order by pe.fecha DESC");
-        
+        pe.fecha BETWEEN "."'".$f3->get('POST.fecha_ini')."'"." AND "."'".$f3->get('POST.fecha_fin')."'"." and pe.estado = 2 order by pe.fecha DESC");
+       // echo $f3->get('DB')->log();
         $f3->get('DB')->commit();
         foreach ($resultado  as $row)
         {             

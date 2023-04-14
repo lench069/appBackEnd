@@ -1,4 +1,6 @@
 <?php
+include "php1/class.phpmailer.php";
+include "php1/class.smtp.php";
 
 class Usuarios_Ctrl
 {
@@ -105,7 +107,7 @@ class Usuarios_Ctrl
             } else {
                 $this->M_Usuario->set('usuario', $f3->get('POST.usuario'));
                 if(/*md5*/($f3->get('POST.clave')) != $this->M_Usuario->get('clave') && $f3->get('POST.clave') != '') {
-                    $this->M_Usuario->set('clave', md5($f3->get('POST.clave')));
+                    $this->M_Usuario->set('clave', $f3->get('POST.clave'));
                 }
                 $this->M_Usuario->set('nombre', $f3->get('POST.nombre'));
                 $this->M_Usuario->set('telefono', $f3->get('POST.telefono'));
@@ -156,4 +158,113 @@ class Usuarios_Ctrl
         ]);
         
     }
+
+    public function olvide_contrasenia($f3)
+{  
+    $this->M_Usuario->load(['correo = ?',$f3->get('POST.correo')]);
+    $pass = $this->generateRandomString(6);
+    $msg='';
+    $flag='';
+    $item = array();
+    if($this->M_Usuario->loaded() > 0)
+    {
+        $this->M_Usuario->set('clave', $pass );
+        $this->M_Usuario->save();
+        if($this->M_Usuario->save())
+        {
+            $this->enviar_correo_datos($f3->get('POST.correo'),'Olvide mi contraseña',$pass);
+        }
+        $item = $this->M_Usuario->cast();
+        $flag = 'true';
+        $msg = 'Solicitud de cambio de contraseña correcta';
+
+    }else
+    {
+        $flag = 'false';
+        $msg = 'No existe usuario con ese CI/RUC o correo';
+    }
+    echo json_encode([
+        'mensaje' => $msg,
+        'flag' => $flag,
+        'info' =>[
+            'item'=>$item
+        ]
+    ]);
+}
+
+function generateRandomString($length) { 
+    return substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, $length); 
+}
+
+public function enviar_correo_datos($correo,$asuntop,$pass)
+    {
+        $nombre = 'Recuperacion de contraseña';
+        $mail = 'info_repicar@riobytes.com';
+        $asunto = $asuntop;
+
+        $email_user = "info_repicar@riobytes.com";
+        $email_password = "P@ssw0rd6969";
+        $the_subject = $asunto;
+        $address_to = $correo; //AQUI CAMBIAR EL CORREO AL QUE QUIEES QUE TE LLEGUEN LOS CORREOS
+        $from_name = $nombre;
+        $phpmailer = new PHPMailer();
+        // ---------- datos de la cuenta de Gmail -------------------------------
+        $phpmailer->Username = $email_user;
+        $phpmailer->Password = $email_password; 
+        //-----------------------------------------------------------------------
+        // $phpmailer->SMTPDebug = 1;
+        $phpmailer->SMTPSecure = 'ssl';
+        $phpmailer->Host = "mail.riobytes.com"; // GMail
+        $phpmailer->Port = 465;
+        $phpmailer->IsSMTP(); // use SMTP
+        $phpmailer->SMTPAuth = true;
+        $phpmailer->setFrom($phpmailer->Username,$from_name);
+        $phpmailer->AddAddress($address_to); // recipients email
+        $phpmailer->Subject = $the_subject;	 
+        $phpmailer->Body .="<body style='background-color: black'>
+
+        <!--Copia desde aquí-->
+        <table style='max-width: 600px; padding: 10px; margin:0 auto; border-collapse: collapse;'>
+            <tr>
+                <td style='background-color: #093856; text-align: left; padding: 0'>
+                    
+                        <center><img width='15%' style='display:block; margin: 1.5% 3%' src='https://docs.google.com/uc?export=download&id=1iNXe-TAFQKqvkjbsHB1wmpHSHPJD2VaO'></center>
+                    
+                </td>
+            </tr>
+
+            <tr>
+                <td style='padding: 0'
+                    <img style='padding: 0; display: block' src='https://s19.postimg.org/y5abc5ryr/alola_region.jpg' width='100%'>
+                </td>
+            </tr>
+            
+            <tr>
+                <td style='background-color: #093856'>
+                    <div style='color: #FDFEFE; margin: 4% 10% 2%; text-align: justify;font-family: sans-serif'>
+                        <h2 style='color: #FDC134; margin: 0 0 7px'>Proceso de recupuracion de clave se realizo exitosamente.!</h2>
+                        <p style='margin: 2px; font-size: 15px; style='color: #FFFF'>
+                        Su contraseña temporal es la siguiente:  </p>
+                        <ul style='font-size: 15px;  margin: 10px 0 ; style='color: #FFFF'>
+                            <li>$pass</li>                             
+                        </ul>
+                        <p style='margin: 2px; font-size: 15px; style='color: #FFFF' >
+                        Por favor al ingresar cambiar su contraña.
+                        </p>
+                        
+                        <p style='color: #b3b3b3; font-size: 12px; text-align: center;margin: 30px 0 0'>Derechos reservados</p>
+                    </div>
+                </td>
+            </tr>
+        </table>
+        <!--hasta aquí-->
+
+        </body>";
+
+
+        $phpmailer->IsHTML(true);
+        $phpmailer->Send();
+
+    }
+
 }
